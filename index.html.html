@@ -1,0 +1,266 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .dash { padding: 1.25rem 0; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
+  .topbar-left { display: flex; flex-direction: column; gap: 2px; }
+  .dash-title { font-size: 17px; font-weight: 500; color: var(--color-text-primary); }
+  .dash-sub { font-size: 12px; color: var(--color-text-tertiary); }
+  .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .seg-btn { font-size: 12px; padding: 5px 14px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-secondary); cursor: pointer; transition: all .15s; }
+  .seg-btn.active { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .kpi { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: .9rem 1rem; }
+  .kpi-label { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .05em; }
+  .kpi-val { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  .kpi-delta { font-size: 11px; margin-top: 3px; }
+  .delta-up { color: #3B6D11; }
+  .delta-down { color: #A32D2D; }
+  .charts-row { display: grid; grid-template-columns: minmax(0,1.4fr) minmax(0,1fr); gap: 12px; margin-bottom: 1.25rem; }
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+  .card-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: .75rem; }
+  .card-sub { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: .75rem; }
+  .funnel-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .funnel-label { font-size: 12px; color: var(--color-text-secondary); width: 120px; flex-shrink: 0; }
+  .funnel-bar-wrap { flex: 1; background: var(--color-background-secondary); border-radius: 4px; height: 22px; overflow: hidden; }
+  .funnel-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; transition: width .5s ease; }
+  .funnel-count { font-size: 11px; font-weight: 500; }
+  .funnel-pct { font-size: 11px; color: var(--color-text-tertiary); width: 36px; text-align: right; flex-shrink: 0; }
+  .opp-list { display: flex; flex-direction: column; gap: 8px; }
+  .opp-item { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: .75rem 1rem; display: flex; align-items: flex-start; gap: 10px; }
+  .opp-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+  .opp-body { flex: 1; min-width: 0; }
+  .opp-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px; }
+  .opp-desc { font-size: 11px; color: var(--color-text-secondary); line-height: 1.4; }
+  .opp-pill { font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 500; white-space: nowrap; margin-top: 4px; display: inline-block; }
+  .pill-high { background: #EAF3DE; color: #27500A; }
+  .pill-med { background: #FAEEDA; color: #633806; }
+  .pill-low { background: #F1EFE8; color: #5F5E5A; }
+  .bottom-row { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+  .cohort-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .cohort-item:last-child { border-bottom: none; }
+  .cohort-name { font-size: 12px; color: var(--color-text-primary); }
+  .cohort-meta { font-size: 11px; color: var(--color-text-tertiary); margin-top: 1px; }
+  .cohort-badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 10px; }
+  .exp-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .exp-row:last-child { border-bottom: none; }
+  .exp-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .exp-name { font-size: 12px; color: var(--color-text-primary); flex: 1; }
+  .exp-lift { font-size: 12px; font-weight: 500; }
+  .exp-n { font-size: 11px; color: var(--color-text-tertiary); }
+  .channel-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .channel-label { font-size: 12px; color: var(--color-text-secondary); width: 44px; flex-shrink: 0; }
+  .channel-track { flex: 1; background: var(--color-background-secondary); border-radius: 4px; height: 8px; }
+  .channel-fill { height: 8px; border-radius: 4px; }
+  .channel-val { font-size: 11px; color: var(--color-text-tertiary); width: 36px; text-align: right; }
+  .ai-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 2px 7px; border-radius: 10px; background: #EEEDFE; color: #3C3489; font-weight: 500; margin-left: 6px; }
+</style>
+
+<div class="dash">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="dash-title">Product engagement &amp; cross-sell overview<span class="ai-badge">AI-assisted</span></div>
+      <div class="dash-sub">3.0M clients · all verticals · trailing 90 days · simulated</div>
+    </div>
+    <div class="controls">
+      <button class="seg-btn active" onclick="setSegment('all',this)">All clients</button>
+      <button class="seg-btn" onclick="setSegment('invest',this)">Investing only</button>
+      <button class="seg-btn" onclick="setSegment('wealth',this)">Wealth mgmt</button>
+      <button class="seg-btn" onclick="setSegment('banking',this)">Banking only</button>
+    </div>
+  </div>
+
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <div class="charts-row">
+    <div class="card">
+      <div class="card-title">Cross-sell funnel</div>
+      <div class="card-sub" id="funnel-sub">Clients eligible for cross-sell by stage</div>
+      <div id="funnel"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Top AI-identified opportunities</div>
+      <div class="opp-list" id="opps"></div>
+    </div>
+  </div>
+
+  <div class="bottom-row">
+    <div class="card">
+      <div class="card-title">Active LLM cohorts</div>
+      <div id="cohorts"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Live experiments</div>
+      <div id="experiments"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Channel engagement</div>
+      <div style="margin-top:4px" id="channels"></div>
+      <button style="margin-top:12px;width:100%;font-size:12px;" onclick="sendPrompt('Suggest a Braze journey for re-engaging low email open rate clients at Wealthsimple')">Design a Braze journey ↗</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var segments = {
+  all: {
+    kpis: [
+      { label: "Eligible for cross-sell", val: "1.24M", delta: "+8.2% vs prior period", up: true },
+      { label: "Cross-sell rate (90d)", val: "11.4%", delta: "+1.9pp vs prior period", up: true },
+      { label: "Avg. products per client", val: "1.8", delta: "+0.2 vs prior period", up: true },
+      { label: "Est. incremental ARR", val: "$38.2M", delta: "AI-propensity driven", up: true }
+    ],
+    funnel: [
+      { label: "Eligible base", n: 1240000, pct: 100, color: "#B5D4F4", textColor: "#0C447C" },
+      { label: "Aware (opened)", n: 744000, pct: 60, color: "#85B7EB", textColor: "#0C447C" },
+      { label: "Engaged (clicked)", n: 310000, pct: 25, color: "#378ADD", textColor: "#042C53" },
+      { label: "Converted", n: 141360, pct: 11.4, color: "#185FA5", textColor: "#E6F1FB" }
+    ],
+    opps: [
+      { icon: "↑", iconBg: "#EAF3DE", iconColor: "#27500A", title: "Invest-only → add Cash account", desc: "680K clients with $5K+ idle cash signal. Propensity score: 0.74.", pill: "High", pillClass: "pill-high" },
+      { icon: "◈", iconBg: "#EEEDFE", iconColor: "#3C3489", title: "Banking → activate self-directed investing", desc: "210K clients aged 25–35 with recurring deposits but no invest product.", pill: "High", pillClass: "pill-high" },
+      { icon: "▲", iconBg: "#FAEEDA", iconColor: "#633806", title: "Self-directed → upgrade to Wealth Mgmt", desc: "94K clients with $100K+ AUM, low trading frequency last 60 days.", pill: "Medium", pillClass: "pill-med" }
+    ]
+  },
+  invest: {
+    kpis: [
+      { label: "Eligible for cross-sell", val: "820K", delta: "+6.1% vs prior period", up: true },
+      { label: "Cross-sell rate (90d)", val: "9.8%", delta: "+1.1pp vs prior period", up: true },
+      { label: "Avg. products per client", val: "1.4", delta: "+0.1 vs prior period", up: true },
+      { label: "Est. incremental ARR", val: "$21.4M", delta: "AI-propensity driven", up: true }
+    ],
+    funnel: [
+      { label: "Eligible base", n: 820000, pct: 100, color: "#B5D4F4", textColor: "#0C447C" },
+      { label: "Aware (opened)", n: 459200, pct: 56, color: "#85B7EB", textColor: "#0C447C" },
+      { label: "Engaged (clicked)", n: 172200, pct: 21, color: "#378ADD", textColor: "#042C53" },
+      { label: "Converted", n: 80360, pct: 9.8, color: "#185FA5", textColor: "#E6F1FB" }
+    ],
+    opps: [
+      { icon: "↑", iconBg: "#EAF3DE", iconColor: "#27500A", title: "Add Cash account", desc: "480K invest-only clients with $5K+ idle balance. High propensity.", pill: "High", pillClass: "pill-high" },
+      { icon: "▲", iconBg: "#FAEEDA", iconColor: "#633806", title: "Upgrade to Wealth Mgmt", desc: "94K clients with $100K+ AUM and low recent trading activity.", pill: "Medium", pillClass: "pill-med" },
+      { icon: "◈", iconBg: "#EEEDFE", iconColor: "#3C3489", title: "Enable crypto trading", desc: "120K clients who viewed crypto assets but have not traded.", pill: "Medium", pillClass: "pill-med" }
+    ]
+  },
+  wealth: {
+    kpis: [
+      { label: "Eligible for cross-sell", val: "148K", delta: "+11.3% vs prior period", up: true },
+      { label: "Cross-sell rate (90d)", val: "18.2%", delta: "+3.4pp vs prior period", up: true },
+      { label: "Avg. products per client", val: "2.6", delta: "+0.3 vs prior period", up: true },
+      { label: "Est. incremental ARR", val: "$12.1M", delta: "AI-propensity driven", up: true }
+    ],
+    funnel: [
+      { label: "Eligible base", n: 148000, pct: 100, color: "#B5D4F4", textColor: "#0C447C" },
+      { label: "Aware (opened)", n: 103600, pct: 70, color: "#85B7EB", textColor: "#0C447C" },
+      { label: "Engaged (clicked)", n: 59200, pct: 40, color: "#378ADD", textColor: "#042C53" },
+      { label: "Converted", n: 26936, pct: 18.2, color: "#185FA5", textColor: "#E6F1FB" }
+    ],
+    opps: [
+      { icon: "◈", iconBg: "#EEEDFE", iconColor: "#3C3489", title: "Add Tax-Loss Harvesting", desc: "62K wealth clients not enrolled, with eligible portfolio composition.", pill: "High", pillClass: "pill-high" },
+      { icon: "↑", iconBg: "#EAF3DE", iconColor: "#27500A", title: "Enable premium Cash account", desc: "34K wealth clients with large cash positions outside WS ecosystem.", pill: "High", pillClass: "pill-high" },
+      { icon: "▲", iconBg: "#FAEEDA", iconColor: "#633806", title: "Refer a friend — high-value", desc: "28K clients with NPS 9–10 and no referral in past 12 months.", pill: "Medium", pillClass: "pill-med" }
+    ]
+  },
+  banking: {
+    kpis: [
+      { label: "Eligible for cross-sell", val: "272K", delta: "+14.7% vs prior period", up: true },
+      { label: "Cross-sell rate (90d)", val: "8.1%", delta: "+2.2pp vs prior period", up: true },
+      { label: "Avg. products per client", val: "1.2", delta: "+0.2 vs prior period", up: true },
+      { label: "Est. incremental ARR", val: "$4.7M", delta: "AI-propensity driven", up: true }
+    ],
+    funnel: [
+      { label: "Eligible base", n: 272000, pct: 100, color: "#B5D4F4", textColor: "#0C447C" },
+      { label: "Aware (opened)", n: 152320, pct: 56, color: "#85B7EB", textColor: "#0C447C" },
+      { label: "Engaged (clicked)", n: 54400, pct: 20, color: "#378ADD", textColor: "#042C53" },
+      { label: "Converted", n: 22032, pct: 8.1, color: "#185FA5", textColor: "#E6F1FB" }
+    ],
+    opps: [
+      { icon: "↑", iconBg: "#EAF3DE", iconColor: "#27500A", title: "Activate self-directed investing", desc: "210K banking-only clients aged 25–35 with regular deposits.", pill: "High", pillClass: "pill-high" },
+      { icon: "◈", iconBg: "#EEEDFE", iconColor: "#3C3489", title: "Introduce TFSA / RRSP", desc: "88K clients with no registered account and tax season approaching.", pill: "High", pillClass: "pill-high" },
+      { icon: "▲", iconBg: "#FAEEDA", iconColor: "#633806", title: "Upgrade to Premium card", desc: "41K clients with 6+ months tenure and consistent spending patterns.", pill: "Medium", pillClass: "pill-med" }
+    ]
+  }
+};
+
+var cohorts = [
+  { name: "High idle cash", meta: "LLM-scored · 680K clients", val: "0.74", valBg: "#EAF3DE", valColor: "#27500A" },
+  { name: "Lapsed investors", meta: "Propensity model · 210K clients", val: "0.61", valBg: "#FAEEDA", valColor: "#633806" },
+  { name: "Wealth-ready", meta: "AUM signal · 94K clients", val: "0.58", valBg: "#FAEEDA", valColor: "#633806" },
+  { name: "New depositors", meta: "Behavioural · 312K clients", val: "0.49", valBg: "#F1EFE8", valColor: "#5F5E5A" }
+];
+
+var experiments = [
+  { name: "Personalised subject line", lift: "+14%", n: "n=42K", color: "#1D9E75", up: true },
+  { name: "Push vs email — idle cash", lift: "+9%", n: "n=28K", color: "#1D9E75", up: true },
+  { name: "Wealth upgrade send time", lift: "+6%", n: "n=11K", color: "#1D9E75", up: true },
+  { name: "In-app vs push — new dep.", lift: "-2%", n: "n=18K", color: "#E24B4A", up: false }
+];
+
+var channels = [
+  { label: "Email", pct: 68, color: "#378ADD" },
+  { label: "Push", pct: 52, color: "#7F77DD" },
+  { label: "In-app", pct: 81, color: "#1D9E75" },
+  { label: "SMS", pct: 34, color: "#BA7517" }
+];
+
+var currentSeg = "all";
+
+function fmt(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + "M";
+  if (n >= 1000) return (n/1000).toFixed(0) + "K";
+  return n.toString();
+}
+
+function setSegment(seg, btn) {
+  currentSeg = seg;
+  document.querySelectorAll(".seg-btn").forEach(function(b) { b.classList.remove("active"); });
+  btn.classList.add("active");
+  render();
+}
+
+function render() {
+  var d = segments[currentSeg];
+
+  var kpiHtml = "";
+  d.kpis.forEach(function(k) {
+    kpiHtml += '<div class="kpi"><div class="kpi-label">' + k.label + '</div><div class="kpi-val">' + k.val + '</div><div class="kpi-delta ' + (k.up ? "delta-up" : "delta-down") + '">' + k.delta + '</div></div>';
+  });
+  document.getElementById("kpi-grid").innerHTML = kpiHtml;
+
+  var funnelHtml = "";
+  d.funnel.forEach(function(f) {
+    var w = Math.max(f.pct, 4);
+    funnelHtml += '<div class="funnel-row"><div class="funnel-label">' + f.label + '</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:' + w + '%;background:' + f.color + '"><span class="funnel-count" style="color:' + f.textColor + '">' + fmt(f.n) + '</span></div></div><div class="funnel-pct">' + f.pct + '%</div></div>';
+  });
+  document.getElementById("funnel").innerHTML = funnelHtml;
+
+  var oppHtml = "";
+  d.opps.forEach(function(o) {
+    oppHtml += '<div class="opp-item"><div class="opp-icon" style="background:' + o.iconBg + ';color:' + o.iconColor + '">' + o.icon + '</div><div class="opp-body"><div class="opp-title">' + o.title + '</div><div class="opp-desc">' + o.desc + '</div><span class="opp-pill ' + o.pillClass + '">' + o.pill + ' propensity</span></div></div>';
+  });
+  document.getElementById("opps").innerHTML = oppHtml;
+
+  var cohortHtml = "";
+  cohorts.forEach(function(c) {
+    cohortHtml += '<div class="cohort-item"><div><div class="cohort-name">' + c.name + '</div><div class="cohort-meta">' + c.meta + '</div></div><span class="cohort-badge" style="background:' + c.valBg + ';color:' + c.valColor + '">' + c.val + '</span></div>';
+  });
+  document.getElementById("cohorts").innerHTML = cohortHtml;
+
+  var expHtml = "";
+  experiments.forEach(function(e) {
+    expHtml += '<div class="exp-row"><div class="exp-dot" style="background:' + e.color + '"></div><div class="exp-name">' + e.name + '</div><span class="exp-lift" style="color:' + e.color + '">' + e.lift + '</span><span class="exp-n">' + e.n + '</span></div>';
+  });
+  document.getElementById("experiments").innerHTML = expHtml;
+
+  var chHtml = "";
+  channels.forEach(function(c) {
+    chHtml += '<div class="channel-row"><div class="channel-label">' + c.label + '</div><div class="channel-track"><div class="channel-fill" style="width:' + c.pct + '%;background:' + c.color + '"></div></div><div class="channel-val">' + c.pct + '%</div></div>';
+  });
+  document.getElementById("channels").innerHTML = chHtml;
+}
+
+render();
+</script>
